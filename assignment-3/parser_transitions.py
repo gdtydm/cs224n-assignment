@@ -17,7 +17,9 @@ class PartialParse(object):
         """
         # The sentence being parsed is kept for bookkeeping purposes. Do not alter it in your code.
         self.sentence = sentence
-
+        self.stack = ["ROOT"]
+        self.buffer = sentence
+        self.dependencies = []
         ### YOUR CODE HERE (3 Lines)
         ### Your code should initialize the following fields:
         ###     self.stack: The current stack represented as a list with the top of the stack as the
@@ -49,8 +51,16 @@ class PartialParse(object):
         ###         1. Shift
         ###         2. Left Arc
         ###         3. Right Arc
-
-
+        if transition == "S":
+            if self.buffer:
+                self.stack.append(self.buffer[0])
+                self.buffer = self.buffer[1:]
+        if transition == "LA":
+            self.dependencies.append((self.stack[-1], self.stack[-2]))
+            self.stack = self.stack[:-2] + [self.stack[-1]]
+        if transition == "RA":
+            self.dependencies.append((self.stack[-2], self.stack[-1]))
+            self.stack = self.stack[:-1]
         ### END YOUR CODE
 
     def parse(self, transitions):
@@ -86,7 +96,27 @@ def minibatch_parse(sentences, model, batch_size):
                                                     contain the parse for sentences[i]).
     """
     dependencies = []
+    partial_parses = [PartialParse(sentence) for sentence in sentences]
+    unfinished_parses = partial_parses[:]
+    while unfinished_parses:
+        if len(unfinished_parses) > batch_size:
+            minibatch = unfinished_parses[:batch_size]
+            unfinished_parses = unfinished_parses[batch_size:]
+        else:
+            minibatch = unfinished_parses
+            unfinished_parses = []
+        while minibatch:
+            transitions = model.predict(minibatch)
+            for transition, pp in zip(transitions, minibatch):
+                pp.parse_step(transition)
+                if len(pp.stack)<2:
+                    minibatch.remove(pp)
 
+                
+
+
+    for pp in partial_parses:
+        dependencies.append(pp.dependencies)
     ### YOUR CODE HERE (~8-10 Lines)
     ### TODO:
     ###     Implement the minibatch parse algorithm as described in the pdf handout

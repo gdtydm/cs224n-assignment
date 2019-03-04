@@ -33,8 +33,8 @@ def train(parser, train_data, dev_data, output_path, batch_size=1024, n_epochs=1
     @param lr (float): Learning rate
     """
     best_dev_UAS = 0
-
-
+    optimizer = torch.optim.Adam(parser.model.parameters(), lr)
+    loss_func = nn.CrossEntropyLoss()
     ### YOUR CODE HERE (~2-7 lines)
     ### TODO:
     ###      1) Construct Adam Optimizer in variable `optimizer`
@@ -86,6 +86,10 @@ def train_for_epoch(parser, train_data, dev_data, optimizer, loss_func, batch_si
             loss = 0. # store loss for this batch here
             train_x = torch.from_numpy(train_x).long()
             train_y = torch.from_numpy(train_y.nonzero()[1]).long()
+            logist = parser.model(train_x)
+            loss = loss_func(logist, train_y)
+            loss.backward()
+            optimizer.step()
 
             ### YOUR CODE HERE (~5-10 lines)
             ### TODO:
