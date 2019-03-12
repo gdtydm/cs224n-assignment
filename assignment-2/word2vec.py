@@ -53,6 +53,9 @@ def naiveSoftmaxLossAndGradient(
     """
 
     ### YOUR CODE HERE
+    ### Please use the provided softmax function (imported earlier in this file)
+    ### This numerically stable implementation helps you avoid issues pertaining
+    ### to integer overflow. 
 
     z = np.dot(outsideVectors, centerWordVec.reshape(-1,1))
     a = softmax(z.reshape(-1,)).reshape(-1,1)
@@ -64,9 +67,6 @@ def naiveSoftmaxLossAndGradient(
     gradOutsideVecs = np.dot(dj_dz, centerWordVec.reshape(1,-1))
 
 
-    ### Please use the provided softmax function (imported earlier in this file)
-    ### This numerically stable implementation helps you avoid issues pertaining
-    ### to integer overflow. 
 
     ### END YOUR CODE
 
@@ -112,6 +112,8 @@ def negSamplingLossAndGradient(
     indices = [outsideWordIdx] + negSampleWordIndices
 
     ### YOUR CODE HERE
+    ### Please use your implementation of sigmoid in here.
+    
     gradOutsideVecs = np.zeros((K, len(centerWordVec)))
     loss = 0
     for i,idx in enumerate(indices):
@@ -123,8 +125,6 @@ def negSamplingLossAndGradient(
             gradCenterVec += outsideVectors[idx] - sigmoid(np.dot(centerWordVec, outsideVectors[idx])) * outsideVectors[idx]
             gradOutsideVecs[i-1,:] = centerWordVec - sigmoid(np.dot(centerWordVec, outsideVectors[idx])) * centerWordVec
     
-    ### Please use your implementation of sigmoid in here.
-
 
     ### END YOUR CODE
 

@@ -17,9 +17,7 @@ class PartialParse(object):
         """
         # The sentence being parsed is kept for bookkeeping purposes. Do not alter it in your code.
         self.sentence = sentence
-        self.stack = ["ROOT"]
-        self.buffer = sentence
-        self.dependencies = []
+
         ### YOUR CODE HERE (3 Lines)
         ### Your code should initialize the following fields:
         ###     self.stack: The current stack represented as a list with the top of the stack as the
@@ -33,6 +31,9 @@ class PartialParse(object):
         ### Note: The root token should be represented with the string "ROOT"
         ###
 
+        self.stack = ["ROOT"]
+        self.buffer = sentence
+        self.dependencies = []
 
         ### END YOUR CODE
 
@@ -96,6 +97,21 @@ def minibatch_parse(sentences, model, batch_size):
                                                     contain the parse for sentences[i]).
     """
     dependencies = []
+  
+    ### YOUR CODE HERE (~8-10 Lines)
+    ### TODO:
+    ###     Implement the minibatch parse algorithm as described in the pdf handout
+    ###
+    ###     Note: A shallow copy (as denoted in the PDF) can be made with the "=" sign in python, e.g.
+    ###                 unfinished_parses = partial_parses[:].
+    ###             Here `unfinished_parses` is a shallow copy of `partial_parses`.
+    ###             In Python, a shallow copied list like `unfinished_parses` does not contain new instances
+    ###             of the object stored in `partial_parses`. Rather both lists refer to the same objects.
+    ###             In our case, `partial_parses` contains a list of partial parses. `unfinished_parses`
+    ###             contains references to the same objects. Thus, you should NOT use the `del` operator
+    ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
+    ###             is being accessed by `partial_parses` and may cause your code to crash.
+
     partial_parses = [PartialParse(sentence) for sentence in sentences]
     unfinished_parses = partial_parses[:]
     while unfinished_parses:
@@ -112,26 +128,8 @@ def minibatch_parse(sentences, model, batch_size):
                 if len(pp.stack)<2:
                     minibatch.remove(pp)
 
-                
-
-
     for pp in partial_parses:
         dependencies.append(pp.dependencies)
-    ### YOUR CODE HERE (~8-10 Lines)
-    ### TODO:
-    ###     Implement the minibatch parse algorithm as described in the pdf handout
-    ###
-    ###     Note: A shallow copy (as denoted in the PDF) can be made with the "=" sign in python, e.g.
-    ###                 unfinished_parses = partial_parses[:].
-    ###             Here `unfinished_parses` is a shallow copy of `partial_parses`.
-    ###             In Python, a shallow copied list like `unfinished_parses` does not contain new instances
-    ###             of the object stored in `partial_parses`. Rather both lists refer to the same objects.
-    ###             In our case, `partial_parses` contains a list of partial parses. `unfinished_parses`
-    ###             contains references to the same objects. Thus, you should NOT use the `del` operator
-    ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
-    ###             is being accessed by `partial_parses` and may cause your code to crash.
-
-
     ### END YOUR CODE
 
     return dependencies
